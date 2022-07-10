@@ -128,15 +128,14 @@ def countPulse(channel):
 #         #GPIO.cleanup()
 #         sys.exit()
 
-# This code makes the code only run if this file is ran directly, and not imported from elsewhere.
-if __name__ == '__main__':
-    currentTime = datetime.datetime(2022, 6, 30)
+
+def collectData():
+    currentTime = datetime.datetime(2022, 6, 30) # ----> This would be now for non-testing purposes
     currentDay = currentTime.day
-    currentYear = currentTime.year
     currentMonth = currentTime.month
     while True:
-        createTestingData(currentTime,144,600) # create one day of data------>These would be the sensor running and time advancing normally
-        currentTime += timedelta(days=1) # jump time forward -----------------^
+        createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
+        currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
         if currentTime.day != currentDay: # if it's a new day
             compileDay(currentDay) # compile previous day
             removeDayFromRaw(currentDay) # clear that day's data
@@ -145,7 +144,11 @@ if __name__ == '__main__':
             compileMonth(currentMonth) # compile previous month
             removeMonthFromDay(currentMonth-1) # clear two months ago's data
             currentMonth = currentTime.month # update marker month
-        if currentTime.year != currentYear: break
+
+
+# This code makes the code only run if this file is ran directly, and not imported from elsewhere.
+if __name__ == '__main__':
+    collectData()
 
 
         
