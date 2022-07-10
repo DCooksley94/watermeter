@@ -1,6 +1,6 @@
 import time, sys
 #import RPi.GPIO as GPIO
-import mysql.connector as mysql
+import mysql.connector
 import datetime
 import random
 from datetime import timedelta
@@ -8,11 +8,11 @@ from datetime import timedelta
 
 
 def rawDataInsert(rawData):
-	dbConnection = mysql.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+	dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
 
 	cursor = dbConnection.cursor()
 
-	insert_flow_data = ("Insert into water_Metres_Raw (recordDate, flowRate) Values (%(date)s, %(flow)s);")
+	insert_flow_data = ("Insert into water_Meter_Raw (recordDate, volume) Values (%(date)s, %(flow)s);")
 
 	cursor.execute(insert_flow_data, rawData)
 
@@ -57,10 +57,10 @@ while True:
         count = 0
         time.sleep(0.5)
 
-    except Error as e:
+    except Exception as e:
         print(e)
         
     except KeyboardInterrupt:
         print('\nkeyboard interrupt!')
-        GPIO.cleanup()
+        #GPIO.cleanup()
         sys.exit()
