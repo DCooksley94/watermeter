@@ -8,3 +8,4 @@ select sum(volume), recordDate from water_meter_raw where Day(recordDate)=10;
 select * from day_Meter_Data;
 select sum(volume), recordDate from day_meter_data where Month(recordDate)=7;
 select * from month_Meter_Data;
+select * from water_meter_raw;

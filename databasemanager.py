@@ -1,9 +1,8 @@
-import time, sys
-#import RPi.GPIO as GPIO
 import mysql.connector
 import datetime
 import random
 from datetime import timedelta
+import reports
 
 def createTestingData(startTime, num, interval):
     for i in range(num):
@@ -107,22 +106,29 @@ def collectData():
         createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
         currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
         if currentTime.day != currentDay: # if it's a new day
+            #SEND DAILY REPORTS
             compileDay(currentDay) # compile previous day
             removeDayFromRaw(currentDay) # clear that day's data
-            #SEND DAILY REPORTS
             #CHECK DAY OF WEEK AND SEND WEEKLY REPORTS, INCREMENT WEEKCOUNT, SEND BIWEEKLY REPORTS
             #CHECK LIMITS AND SEND LIMIT REPORTS
             currentDay = currentTime.day # update marker day
         if currentTime.month != currentMonth: # if it's a new month
+            #SEND MONTHLY REPORTS
             compileMonth(currentMonth) # compile previous month
             removeMonthFromDay(currentMonth-1) # clear two months ago's data
-            #SEND MONTHLY REPORTS
             currentMonth = currentTime.month # update marker month
 
+def testDailyReport():
+    currentTime = datetime.datetime(2022, 6, 30)
+    #createTestingData(currentTime,144,600)
+    currentTime += timedelta(days=1)
+    reports.createDailyReport(currentTime)
 
 # This code makes the code only run if this file is ran directly, and not imported from elsewhere.
 if __name__ == '__main__':
-    collectData()
+    #collectData()
+    testDailyReport()
+
 
 
         
