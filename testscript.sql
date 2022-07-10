@@ -1,0 +1,10 @@
+use `capstoneHugh`;
+-- select sum(volume) from water_meter_raw where id > 9022;
+-- select sum(volume) from water_meter_raw where id > 9000;
+-- select sum(volume) from water_meter_raw;
+-- select sum(volume), Day(recordDate) from water_meter_raw group by Day(recordDate);
+select * from water_meter_raw where id = (select max(id) from water_meter_raw);
+select sum(volume), recordDate from water_meter_raw where Day(recordDate)=10;
+select * from day_Meter_Data;
+select sum(volume), recordDate from day_meter_data where Month(recordDate)=7;
+select * from month_Meter_Data;
