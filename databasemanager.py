@@ -70,6 +70,17 @@ def removeMonthFromDay(month):
     cursor.close()
     dbConnection.close()
 
+def getMonthToDate(month):
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement1 = "SELECT SUM(volume), recordDate FROM day_Meter_Data WHERE Month(recordDate) = %s"
+    cursor.execute(statement1, [month])
+    volume = cursor.fetchall()[0][0]
+    cursor.close()
+    dbConnection.close()
+    return volume
+
+
 def rawDataInsert(rawData):
 	dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
 
@@ -85,64 +96,27 @@ def rawDataInsert(rawData):
 
 	dbConnection.close()
 
-FLOW_SENSOR_GPIO = 13
-#Sets a value of 13 to FLOW_SENSOR_GPIO
-
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)
-
-global count
-count = 0
-#Sets a value of 0 to count
-
-def countPulse(channel):
-   global count
-   if start_counter == 1:
-      count = count+1
- 
-#GPIO.add_event_detect(FLOW_SENSOR_GPIO, GPIO.FALLING, callback=countPulse)
-
-# while True:
-#     try:
-#         randomNumbers = random.randrange(0,80000)
-#         start_counter = 1
-#         time.sleep(0.5)
-#         start_counter = 0
-#         flow = (randomNumbers / 7.5) # Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min. flow = (count / 7.5)
-#         if flow > 0:
-#             flowLps = (flow / 60) # Converts flow rate to L/sec
-#             flowm3 = (flowLps / 1000) # Converts flow L/sec to cubic meters
-#             timeNow = datetime.datetime.now(datetime.timezone(-timedelta(hours=6)))
-#             currentDate = timeNow.strftime('%Y-%m-%d %H:%M:%S')
-#             flow_data = { 'date': currentDate, 'flow': flowm3}
-#             rawDataInsert(flow_data)
-
-#         count = 0
-#         time.sleep(0.5)
-
-#     except Exception as e:
-#         print(e)
-        
-#     except KeyboardInterrupt:
-#         print('\nkeyboard interrupt!')
-#         #GPIO.cleanup()
-#         sys.exit()
 
 
 def collectData():
     currentTime = datetime.datetime(2022, 6, 30) # ----> This would be now for non-testing purposes
     currentDay = currentTime.day
     currentMonth = currentTime.month
+    weekCount = 0
     while True:
         createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
         currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
         if currentTime.day != currentDay: # if it's a new day
             compileDay(currentDay) # compile previous day
             removeDayFromRaw(currentDay) # clear that day's data
+            #SEND DAILY REPORTS
+            #CHECK DAY OF WEEK AND SEND WEEKLY REPORTS, INCREMENT WEEKCOUNT, SEND BIWEEKLY REPORTS
+            #CHECK LIMITS AND SEND LIMIT REPORTS
             currentDay = currentTime.day # update marker day
         if currentTime.month != currentMonth: # if it's a new month
             compileMonth(currentMonth) # compile previous month
             removeMonthFromDay(currentMonth-1) # clear two months ago's data
+            #SEND MONTHLY REPORTS
             currentMonth = currentTime.month # update marker month
 
 
