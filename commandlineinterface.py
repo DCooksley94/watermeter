@@ -1,5 +1,7 @@
 import mysql.connector
-
+import reports
+import datetime
+from datetime import timedelta
 def getValidUsername(cursor):
     try:
         while True:
@@ -71,18 +73,40 @@ def validateUser():
     result = cursor.fetchall()
     cursor.close()
     dbConnection.close()
-    if len(result) > 0: return True
-    else: return False
+    if len(result) > 0: return username
+    else: return ""
 
+def scheduleReport(username):
+    pass
+
+def instantReport(freq, username):
+    pass
 
 if __name__ == '__main__':
     while True:
-        userInput = input("Enter 1 to log in, or 2 to create a new user: ")
-        if userInput == "1":
-            if validateUser():
+        username = ""
+        while True:
+            userInput = input("Enter 1 to log in, or 2 to create a new user: ")
+            if userInput == "1":
+                username = validateUser()
+                if username != "":
+                    break
+                else: print("Invalid credentials")
+            elif userInput == "2":
+                addUser()
+            else:
+                print("Invalid input")
+        print("Welcome user.")
+        while True:
+            userInput = input("Enter 1 to schedule automatic report, 2 to generate an instant daily report, 3 to generate an instant monthly report, or 4 to sign out: ")
+            if userInput == "1":
+                scheduleReport(username)
+            elif userInput == "2":
+                instantReport("daily", username)
+            elif userInput == "3":
+                instantReport("monthly", username)
+            elif userInput == "4":
                 break
-        elif userInput == "2":
-            addUser()
-        else:
-            print("Invalid input")
-    print("Welcome user.")
+            else:
+                print("Invalid input")
+    
