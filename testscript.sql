@@ -14,5 +14,9 @@ INSERT INTO User values ("username", "password", "Joe", "Schmoe", "email@email.c
 select * from User;
 select username from User where username="dcooksley" and password = "notpassword";
 select * from Report;
+delete from Report where id = 3;
 delete from Report where id = 2;
-insert into Report(`freq`,`user`,`limit`) values ("limit", "dcooksley", 200)
+insert into Report(`freq`,`user`,`limit`) values ("limit", "dcooksley", 200);
+delete from water_meter_raw where id > 0;
+delete from day_meter_data;
+delete from month_meter_data;

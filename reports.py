@@ -169,6 +169,7 @@ def createMonthlyReport(currentTime):
     plt.ylabel("Volume (m^3)")
     plt.title("Water report for {}".format((currentTime - timedelta(days=1)).strftime("%x")))
     plt.savefig("report.png")
+    plt.close()
     df.to_csv("report.csv")
     cursor.close()
     dbConnection.close()

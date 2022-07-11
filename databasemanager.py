@@ -1,7 +1,8 @@
 import mysql.connector
 import datetime
 import random
-from datetime import timedelta
+from datetime import timedelta, date
+import time
 import reports
 
 def createTestingData(startTime, num, interval):
@@ -82,46 +83,86 @@ def getMonthToDate(month):
 
 def rawDataInsert(rawData):
 	dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
-
 	cursor = dbConnection.cursor()
-
 	insert_flow_data = ("Insert into water_Meter_Raw (recordDate, volume) Values (%(date)s, %(flow)s);")
-
 	cursor.execute(insert_flow_data, rawData)
-
 	dbConnection.commit()
-
 	cursor.close()
-
 	dbConnection.close()
 
 def collectData():
-    currentTime = datetime.datetime(2022, 6, 27) # ----> This would be now for actual use purposes
+    currentTime = datetime.datetime.now()
     currentDay = currentTime.day
     currentMonth = currentTime.month
     weekCount = 0
     while True:
-        createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
-        currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
+
+        #TESTING CODE:
+        #createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
+        #currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
+        
+        time.sleep(3600) # Sleeps for a minute, this could be higher, but it shouldn't be particularly computationally expensive anyway
+
         if currentTime.day != currentDay: # if it's a new day
-            #SEND DAILY REPORTS
+            sendReports("daily", currentTime) # Send daily reports
             compileDay(currentDay) # compile previous day
             removeDayFromRaw(currentDay) # clear that day's data
-            #CHECK DAY OF WEEK AND SEND WEEKLY REPORTS, INCREMENT WEEKCOUNT, SEND BIWEEKLY REPORTS
-            #CHECK LIMITS AND SEND LIMIT REPORTS
+            if date.weekday(currentTime.date()) == 0: # Check day of week (0 is monday, 6 is sunday)
+                sendReports("weekly", currentTime) # Send weekly reports
+                weekCount += 1 # Increment weekcount
+                if weekCount%2==0:
+                    sendReports("bi-weekly", currentTime) # If even week, send biweekly reports
+            totalMonthVolume = getMonthToDate(currentMonth)
+            handleLimitReports(totalMonthVolume, currentTime) # check if limits have been reached and send reports
             currentDay = currentTime.day # update marker day
         if currentTime.month != currentMonth: # if it's a new month
-            #SEND MONTHLY REPORTS
+            sendReports("monthly", currentTime)
             compileMonth(currentMonth) # compile previous month
             removeMonthFromDay(currentMonth-1) # clear two months ago's data
             currentMonth = currentTime.month # update marker month
 
+def sendReports(freq, currentTime):
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement1 = ("SELECT `id`,`user` FROM Report WHERE `freq`=%s")
+    cursor.execute(statement1, [freq])
+    results = cursor.fetchall()
+    for result in results:
+        user = result[1]
+        statement2 = "SELECT FName, LName, email FROM USER WHERE username=%s"
+        cursor.execute(statement2,[user])
+        result2 = cursor.fetchall()[0]
+        fName = result2[0]
+        lName = result2[1]
+        email = result2[2]
+        reports.createReport(freq, fName, lName, email, currentTime)
+    cursor.close()
+    dbConnection.close()
+
+def handleLimitReports(totalMonthVolume, currentTime):
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement1 = ("SELECT `id`,`user`,`limit` FROM Report WHERE `freq`=%s")
+    cursor.execute(statement1, ["limit"])
+    results = cursor.fetchall()
+    for result in results:
+        limit = result[2]
+        if limit <= totalMonthVolume:
+            user = result[1]
+            statement2 = "SELECT FName, LName, email FROM USER WHERE username=%s"
+            cursor.execute(statement2,[user])
+            result2 = cursor.fetchall()[0]
+            fName = result2[0]
+            lName = result2[1]
+            email = result2[2]
+            reports.createReport("limit", fName, lName, email, currentTime)
+    cursor.close()
+    dbConnection.close()
 
 
 # This code makes the code only run if this file is ran directly, and not imported from elsewhere.
 if __name__ == '__main__':
     collectData()
-    pass
 
 
 
