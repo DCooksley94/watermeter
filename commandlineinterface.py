@@ -144,6 +144,33 @@ def instantReport(freq, username):
     dbConnection.close()
     reports.createReport(freq, fName, lName, email, currentTime=datetime.datetime.now())
 
+def viewTable():
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = ""
+    while True:
+        userInput = input("Which table would you like to view? 1: Raw Data, 2: Daily Data, 3: Monthly data, 4: cancel: ")
+        if userInput == "1":
+            statement = "SELECT * FROM water_Meter_Raw"
+            break
+        elif userInput == "2":
+            statement = "SELECT * FROM day_Meter_Data"
+            break
+        elif userInput == "3":
+            statement = "SELECT * FROM month_Meter_Data"
+            break
+        elif userInput == "4":
+            break
+        else:
+            print("Invalid input")
+    if statement != "":
+        cursor.execute(statement)
+        results = cursor.fetchall()
+        for result in results:
+            print(result)
+    cursor.close()
+    dbConnection.close()
+            
 
 if __name__ == '__main__':
     while True:
@@ -161,7 +188,7 @@ if __name__ == '__main__':
                 print("Invalid input")
         print("Welcome user.")
         while True:
-            userInput = input("Enter 1 to schedule automatic report, 2 to generate an instant daily report, 3 to generate an instant monthly report, or 4 to sign out: ")
+            userInput = input("Enter 1 to schedule automatic report, 2 to generate an instant daily report, 3 to generate an instant monthly report, 4 to view a database table, or 5 to sign out: ")
             if userInput == "1":
                 scheduleReport(username)
             elif userInput == "2":
@@ -169,6 +196,8 @@ if __name__ == '__main__':
             elif userInput == "3":
                 instantReport("monthly", username)
             elif userInput == "4":
+                viewTable()
+            elif userInput == "5":
                 break
             else:
                 print("Invalid input")

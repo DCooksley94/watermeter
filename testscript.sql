@@ -18,5 +18,6 @@ delete from Report where id = 3;
 delete from Report where id = 2;
 insert into Report(`freq`,`user`,`limit`) values ("limit", "dcooksley", 200);
 delete from water_meter_raw where id > 0;
-delete from day_meter_data;
-delete from month_meter_data;
+delete from day_meter_data where id > 0;
+delete from month_meter_data where id > 0;
+delete from report where id > 0;

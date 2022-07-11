@@ -101,7 +101,7 @@ def collectData():
         #createTestingData(currentTime,144,600) # create one day of data------>The sensor would be running and adding data to the database in its own process (NOT HERE)
         #currentTime += timedelta(days=1) # jump time forward --->Have a waiting delay so the loop doesn't run excessively, and update currentTime to now
         
-        time.sleep(3600) # Sleeps for a minute, this could be higher, but it shouldn't be particularly computationally expensive anyway
+        time.sleep(3600) # Sleeps for a minute, this could be higher, but it shouldn't be particularly computationally expensive anyway. comment out when testing
 
         if currentTime.day != currentDay: # if it's a new day
             sendReports("daily", currentTime) # Send daily reports
