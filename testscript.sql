@@ -12,4 +12,7 @@ select * from water_meter_raw;
 select recordDate, volume from day_Meter_Data where recordDate >= "2022-06-28 00:00:00" AND recordDate < "2022-07-03 00:00:00";
 INSERT INTO User values ("username", "password", "Joe", "Schmoe", "email@email.com");
 select * from User;
-select username from User where username="dcooksley" and password = "notpassword"
+select username from User where username="dcooksley" and password = "notpassword";
+select * from Report;
+delete from Report where id = 2;
+insert into Report(`freq`,`user`,`limit`) values ("limit", "dcooksley", 200)

@@ -76,11 +76,74 @@ def validateUser():
     if len(result) > 0: return username
     else: return ""
 
+def addReportToDB(freq, username):
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "INSERT INTO Report(freq, user) VALUES (%s, %s)"
+    cursor.execute(statement, [freq, username])
+    dbConnection.commit()
+    cursor.close()
+    dbConnection.close()
+    print("Successfully scheduled {} report for user {}".format(freq, username))
+
+def addLimitReportToDB(username, limit):
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "INSERT INTO Report(`freq`, `user`, `limit`) VALUES (%s, %s, %s)"
+    cursor.execute(statement, ["limit", username, limit])
+    dbConnection.commit()
+    cursor.close()
+    dbConnection.close()
+    print("Successfully scheduled limit report of {}m^3 for user {}".format(limit, username))
+
 def scheduleReport(username):
-    pass
+    while True:
+        print("How often would you like your report?")
+        print("   1: daily\n   2: weekly\n   3: bi-weekly\n   4: monthly\n   5: upon reaching a limit\n   6: cancel")
+        userInput = input("Enter your choice: ")
+        if userInput == "1":
+            addReportToDB("daily", username)
+            break
+        elif userInput == "2":
+            addReportToDB("weekly", username)
+            break
+        elif userInput == "3":
+            addReportToDB("bi-weekly", username)
+            break
+        elif userInput == "4":
+            addReportToDB("monthly", username)
+            break
+        elif userInput == "5":
+            limit = 0
+            while True:
+                try:
+                    userInput2 = input("Enter your limit in m^3: ")
+                    limit = float(userInput2)
+                    break
+                except ValueError:
+                    print("Limit must be a number.")
+            addLimitReportToDB(username, limit)
+            break
+        elif userInput == "6":
+            break
+        else:
+            print("Invalid input.")
+
+
 
 def instantReport(freq, username):
-    pass
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "SELECT FName, LName, email FROM USER WHERE username=%s"
+    cursor.execute(statement, [username])
+    result = cursor.fetchall()[0]
+    fName = result[0]
+    lName = result[1]
+    email = result[2]
+    cursor.close()
+    dbConnection.close()
+    reports.createReport(freq, fName, lName, email, currentTime=datetime.datetime.now())
+
 
 if __name__ == '__main__':
     while True:

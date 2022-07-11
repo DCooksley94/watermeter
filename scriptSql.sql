@@ -46,6 +46,7 @@ Create table if not exists `capstoneHugh`.`Report`
     `id` int not null auto_increment,
     `freq` enum("daily","weekly","bi-weekly","monthly","limit"),
     `user` varchar(20) not null,
+    `limit` double,
     primary key (`id`),
     foreign key (`user`) references `capstoneHugh`.`User`(`username`) on delete cascade on update cascade
 ) engine = innodb;
