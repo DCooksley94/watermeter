@@ -95,10 +95,8 @@ def rawDataInsert(rawData):
 
 	dbConnection.close()
 
-
-
 def collectData():
-    currentTime = datetime.datetime(2022, 6, 30) # ----> This would be now for non-testing purposes
+    currentTime = datetime.datetime(2022, 6, 27) # ----> This would be now for actual use purposes
     currentDay = currentTime.day
     currentMonth = currentTime.month
     weekCount = 0
@@ -118,16 +116,13 @@ def collectData():
             removeMonthFromDay(currentMonth-1) # clear two months ago's data
             currentMonth = currentTime.month # update marker month
 
-def testDailyReport():
-    currentTime = datetime.datetime(2022, 6, 30)
-    #createTestingData(currentTime,144,600)
-    currentTime += timedelta(days=1)
-    reports.createDailyReport(currentTime)
+
 
 # This code makes the code only run if this file is ran directly, and not imported from elsewhere.
 if __name__ == '__main__':
-    #collectData()
-    testDailyReport()
+    collectData()
+    pass
+
 
 
 

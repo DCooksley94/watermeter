@@ -111,17 +111,74 @@ def createDailyReport(currentTime):
     df.to_csv("report.csv")
     cursor.close()
     dbConnection.close()
+
+
 def createWeeklyReport(currentTime):
-    pass
+    reportStartTime = (currentTime - timedelta(days=7))
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "SELECT recordDate, volume FROM day_Meter_Data WHERE recordDate >= %s AND recordDate < %s"
+    cursor.execute(statement, [reportStartTime.strftime('%Y-%m-%d %H:%M:%S'), currentTime.strftime('%Y-%m-%d %H:%M:%S')])
+    result = cursor.fetchall()
+    df = pd.DataFrame(data=result, columns=["time", "volume"])
+    df=df.set_index('time')
+    plt.figure(figsize=(10,8))
+    ax = sns.lineplot(x=df.index, y=df["volume"])
+    plt.xticks(rotation=45)
+    plt.ylabel("Volume (m^3)")
+    plt.title("Water report for {}".format((currentTime - timedelta(days=1)).strftime("%x")))
+    plt.savefig("report.png")
+    df.to_csv("report.csv")
+    cursor.close()
+    dbConnection.close()
+
+
 def createBiWeeklyReport(currentTime):
-    pass
+    reportStartTime = (currentTime - timedelta(days=14))
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "SELECT recordDate, volume FROM day_Meter_Data WHERE recordDate >= %s AND recordDate < %s"
+    cursor.execute(statement, [reportStartTime.strftime('%Y-%m-%d %H:%M:%S'), currentTime.strftime('%Y-%m-%d %H:%M:%S')])
+    result = cursor.fetchall()
+    df = pd.DataFrame(data=result, columns=["time", "volume"])
+    df=df.set_index('time')
+    plt.figure(figsize=(10,8))
+    ax = sns.lineplot(x=df.index, y=df["volume"])
+    plt.xticks(rotation=45)
+    plt.ylabel("Volume (m^3)")
+    plt.title("Water report for {}".format((currentTime - timedelta(days=1)).strftime("%x")))
+    plt.savefig("report.png")
+    df.to_csv("report.csv")
+    cursor.close()
+    dbConnection.close()
+
+
 def createMonthlyReport(currentTime):
-    pass
+    reportMonth = (currentTime - timedelta(days=1)).month
+    reportYear = (currentTime - timedelta(days=1)).year
+    dbConnection = mysql.connector.connect(user='capstone', password='password', host='127.0.0.1', database='capstoneHugh')
+    cursor = dbConnection.cursor()
+    statement = "SELECT recordDate, volume FROM day_Meter_Data WHERE MONTH(recordDate) = %s AND YEAR(recordDate) = %s"
+    cursor.execute(statement, [reportMonth, reportYear])
+    result = cursor.fetchall()
+    df = pd.DataFrame(data=result, columns=["time", "volume"])
+    df=df.set_index('time')
+    plt.figure(figsize=(10,8))
+    ax = sns.lineplot(x=df.index, y=df["volume"])
+    plt.xticks(rotation=45)
+    plt.ylabel("Volume (m^3)")
+    plt.title("Water report for {}".format((currentTime - timedelta(days=1)).strftime("%x")))
+    plt.savefig("report.png")
+    df.to_csv("report.csv")
+    cursor.close()
+    dbConnection.close()
+
+
 def createLimitReport(currentTime):
-    pass
+    createMonthlyReport(currentTime + timedelta(days=1))
 
 if __name__ == '__main__':
-    currentTime = datetime.datetime(2022, 6, 30)
-    currentTime += timedelta(days=1)
-    #createDailyReport(currentTime)
-    createReport("daily", "David", "Cooksley", "davidcooksley@me.com", currentTime)
+    #currentTime = datetime.datetime(2023, 7, 14)
+    #createLimitReport(currentTime)
+    #createReport("limit", "David", "Cooksley", "davidcooksley@me.com", currentTime)
+    pass
